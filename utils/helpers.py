@@ -58,7 +58,8 @@ def load_ventas() -> pd.DataFrame:
         return pd.DataFrame([{
             "ID": r.id, "Fecha": r.fecha, "Categoría": r.categoria,
             "Cantidad": r.cantidad, "Kgs": r.kgs,
-            "Precio Total": r.precio_total, "Notas": r.notas or "",
+            "Precio Total": r.precio_total, "Composición": r.composicion or "",
+            "Notas": r.notas or "",
         } for r in rows])
     finally:
         db.close()
@@ -70,7 +71,7 @@ def load_mortandad() -> pd.DataFrame:
         rows = db.query(Mortandad).order_by(Mortandad.fecha.desc()).all()
         return pd.DataFrame([{
             "ID": r.id, "Fecha": r.fecha, "Categoría": r.categoria,
-            "Descripción": r.descripcion or "", "Nro Caravana": r.numero_caravana,
+            "Descripción": r.descripcion or "",
             "Potrero": r.potrero or "",
         } for r in rows])
     finally:

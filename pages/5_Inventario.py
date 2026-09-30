@@ -38,9 +38,18 @@ for mov in movs:
         stock[cat] += mov.cantidad  # puede ser negativo para ajustes
 
 for v in ventas:
-    cat = v.categoria.lower()
-    if cat in stock:
-        stock[cat] -= v.cantidad
+    if v.composicion:
+        # Lote mixto: descuenta cada categoría según su composición.
+        for parte in v.composicion.split(","):
+            if ":" in parte:
+                cat, n = parte.split(":", 1)
+                cat = cat.strip().lower()
+                if cat in stock:
+                    stock[cat] -= int(n)
+    else:
+        cat = v.categoria.lower()
+        if cat in stock:
+            stock[cat] -= v.cantidad
 
 for b in bajas:
     cat = b.categoria.lower()

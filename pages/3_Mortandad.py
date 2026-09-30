@@ -25,7 +25,6 @@ with st.expander("➕ Registrar nueva baja", expanded=False):
             fecha = st.date_input("Fecha", value=date.today())
             categoria = st.selectbox("Categoría", CATEGORIAS)
         with c2:
-            numero_caravana = st.number_input("Nro. caravana (opcional)", min_value=0, step=1, value=0)
             potrero = st.text_input("Potrero (opcional)")
         with c3:
             descripcion = st.text_area("Descripción / causa", height=100)
@@ -38,7 +37,6 @@ with st.expander("➕ Registrar nueva baja", expanded=False):
                 fecha=fecha,
                 categoria=categoria,
                 descripcion=descripcion.strip() or None,
-                numero_caravana=int(numero_caravana) if numero_caravana > 0 else None,
                 potrero=potrero.strip() or None,
             )
             db.add(baja)
@@ -76,20 +74,21 @@ else:
 
     st.metric("Total bajas en el filtro", len(filtrado))
 
-    # Gráfico
-    col_tab, col_graf = st.columns([2, 1])
-    with col_tab:
-        editable_table(
-            filtrado,
-            Mortandad,
-            {
-                "Fecha": "fecha", "Categoría": "categoria", "Descripción": "descripcion",
-                "Nro Caravana": "numero_caravana", "Potrero": "potrero",
-            },
-            key="edit_mortandad",
-        )
+    # Grilla a todo el ancho
+    editable_table(
+        filtrado,
+        Mortandad,
+        {
+            "Fecha": "fecha", "Categoría": "categoria", "Descripción": "descripcion",
+            "Potrero": "potrero",
+        },
+        key="edit_mortandad",
+    )
 
-    with col_graf:
+    # Gráficos debajo de la grilla
+    st.markdown("---")
+    col_graf1, col_graf2 = st.columns(2)
+    with col_graf1:
         st.markdown("**Por categoría**")
         por_cat = filtrado["Categoría"].value_counts().reset_index()
         por_cat.columns = ["Categoría", "Cantidad"]
@@ -98,6 +97,7 @@ else:
         fig.update_layout(margin=dict(t=10, b=10), showlegend=True)
         st.plotly_chart(fig, use_container_width=True)
 
+    with col_graf2:
         st.markdown("**Por mes**")
         filtrado["Mes"] = filtrado["Fecha"].dt.to_period("M").astype(str)
         por_mes = filtrado["Mes"].value_counts().sort_index().reset_index()

@@ -27,4 +27,17 @@ def get_session():
 
 def init_db():
     from database import models as _  # noqa: F401 — registra los modelos con Base
-    Base.metadata.create_all(bind=get_engine())
+    engine = get_engine()
+    Base.metadata.create_all(bind=engine)
+    _migrar_columnas(engine)
+
+
+def _migrar_columnas(engine):
+    """Agrega columnas nuevas a tablas existentes (migración liviana, idempotente)."""
+    from sqlalchemy import inspect, text
+    insp = inspect(engine)
+    if "ventas" in insp.get_table_names():
+        cols = [c["name"] for c in insp.get_columns("ventas")]
+        if "composicion" not in cols:
+            with engine.begin() as conn:
+                conn.execute(text("ALTER TABLE ventas ADD COLUMN composicion VARCHAR(255)"))

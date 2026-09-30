@@ -9,10 +9,11 @@ class Venta(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     fecha = Column(Date, nullable=False)
-    categoria = Column(String(50), nullable=False)   # terneros, terneras, vacas, novillos, toros
+    categoria = Column(String(50), nullable=False)   # terneros, terneras, vacas, novillos, toros, mixto
     cantidad = Column(Integer, nullable=False)
     kgs = Column(Float, nullable=True)
     precio_total = Column(Float, nullable=False)
+    composicion = Column(String(255), nullable=True)  # lote mixto: "terneros:12,terneras:58"
     notas = Column(Text, nullable=True)
 
 
