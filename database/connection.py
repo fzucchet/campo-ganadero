@@ -12,9 +12,11 @@ Base = declarative_base()
 @st.cache_resource
 def get_engine():
     database_url = os.getenv("DATABASE_URL", "sqlite:///campo.db")
-    # Railway provee postgres://, SQLAlchemy necesita postgresql://
+    # Normaliza a psycopg2 explícito (independiente del driver por defecto de SQLAlchemy).
     if database_url.startswith("postgres://"):
-        database_url = database_url.replace("postgres://", "postgresql://", 1)
+        database_url = database_url.replace("postgres://", "postgresql+psycopg2://", 1)
+    elif database_url.startswith("postgresql://"):
+        database_url = database_url.replace("postgresql://", "postgresql+psycopg2://", 1)
     connect_args = {"check_same_thread": False} if database_url.startswith("sqlite") else {}
     return create_engine(database_url, connect_args=connect_args)
 
