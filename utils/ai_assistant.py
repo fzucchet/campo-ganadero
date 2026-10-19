@@ -23,12 +23,12 @@ def _build_context() -> str:
             for v in ventas
         ) or "  Sin datos"
 
-        # Mortandad del año
-        bajas = db.query(Mortandad).filter(
-            Mortandad.fecha >= date(año, 1, 1)
-        ).all()
+        # Mortandad (histórico completo)
+        bajas = db.query(Mortandad).order_by(Mortandad.fecha.desc()).all()
         bajas_resumen = "\n".join(
-            f"  - {b.fecha.strftime('%d/%m/%Y')}: {b.categoria}, {b.descripcion or ''}"
+            f"  - {b.fecha.strftime('%d/%m/%Y')}: {b.categoria}, "
+            f"potrero={b.potrero or 'N/D'}, "
+            f"caravana={b.numero_caravana or 'N/D'}, {b.descripcion or ''}"
             for b in bajas
         ) or "  Sin datos"
 
