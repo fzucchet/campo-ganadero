@@ -110,6 +110,11 @@ Respondé siempre en español rioplatense (vos, ustedes).
 Sé conciso pero completo. Cuando hagas cálculos, mostrá los números claramente.
 Si no tenés datos suficientes para responder con certeza, decilo.
 
+Al contar o filtrar por potrero, ignorá mayúsculas/minúsculas y tildes
+(ej.: "laguna", "Laguna" y "la laguna" son el mismo potrero). Cada línea de
+MORTANDAD es una baja individual: para "cuántos murieron" contá las líneas
+que coincidan con el potrero y la categoría pedidos.
+
 Los datos del campo están incluidos en el contexto de cada mensaje.
 """
 

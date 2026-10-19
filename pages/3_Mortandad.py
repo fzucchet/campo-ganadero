@@ -5,7 +5,7 @@ from datetime import date
 from database.connection import get_session
 from database.models import Mortandad
 from utils.auth import require_auth
-from utils.helpers import load_mortandad
+from utils.helpers import load_mortandad, load_potreros
 from utils.editor import editable_table
 
 st.set_page_config(page_title="Mortandad | Campo Ganadero", page_icon="💀", layout="wide")
@@ -18,6 +18,9 @@ st.markdown("Registro de bajas de hacienda")
 st.markdown("---")
 
 # ── Formulario de carga ───────────────────────────────────────────────────────
+df_potreros = load_potreros()
+potreros_lista = df_potreros["Nombre"].tolist() if not df_potreros.empty else []
+
 with st.expander("➕ Registrar nueva baja", expanded=False):
     with st.form("form_mort", clear_on_submit=True):
         c1, c2, c3 = st.columns(3)
@@ -25,19 +28,24 @@ with st.expander("➕ Registrar nueva baja", expanded=False):
             fecha = st.date_input("Fecha", value=date.today())
             categoria = st.selectbox("Categoría", CATEGORIAS)
         with c2:
-            potrero = st.text_input("Potrero (opcional)")
+            if potreros_lista:
+                potrero = st.selectbox("Potrero (opcional)", ["(Sin especificar)"] + potreros_lista)
+            else:
+                potrero = st.text_input("Potrero (opcional)")
+                st.caption("💡 Registrá tus potreros en la página Potreros para elegirlos de una lista.")
         with c3:
             descripcion = st.text_area("Descripción / causa", height=100)
         submitted = st.form_submit_button("💾 Guardar baja", type="primary", use_container_width=True)
 
     if submitted:
+        potrero_val = potrero.strip() if potrero and potrero != "(Sin especificar)" else None
         db = get_session()
         try:
             baja = Mortandad(
                 fecha=fecha,
                 categoria=categoria,
                 descripcion=descripcion.strip() or None,
-                potrero=potrero.strip() or None,
+                potrero=potrero_val,
             )
             db.add(baja)
             db.commit()
