@@ -60,11 +60,19 @@ def _normalizar_potreros_mortandad(engine):
         return
 
     with engine.begin() as conn:
-        canonicos = {
-            nombre.strip().lower(): nombre
-            for (nombre,) in conn.execute(text("SELECT nombre FROM potreros")).all()
-            if nombre and nombre.strip()
-        }
+        canonicos = {}
+        filas = conn.execute(text("SELECT nombre, numero FROM potreros")).all()
+        # Primero por nombre (tiene prioridad), luego por número.
+        for nombre, _numero in filas:
+            if nombre and nombre.strip():
+                canonicos[nombre.strip().lower()] = nombre
+        for nombre, numero in filas:
+            if not (nombre and nombre.strip() and numero):
+                continue
+            for parte in str(numero).split(","):
+                clave = parte.strip().lower()
+                if clave and clave not in canonicos:
+                    canonicos[clave] = nombre
         if not canonicos:
             return
         valores = conn.execute(
