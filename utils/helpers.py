@@ -86,7 +86,7 @@ def load_trabajos() -> pd.DataFrame:
             "ID": r.id, "Fecha": r.fecha, "Categoría": r.categoria or "Otro",
             "Tipo de Trabajo": r.tipo_trabajo,
             "Animales": r.animales or "", "Resultado": r.resultado or "",
-            "Notas": r.notas or "",
+            "Potrero": r.potrero or "", "Notas": r.notas or "",
         } for r in rows])
     finally:
         db.close()

@@ -35,7 +35,8 @@ def _build_context() -> str:
         # Trabajos recientes (últimos 20)
         trabajos = db.query(TrabajoCorral).order_by(TrabajoCorral.fecha.desc()).limit(20).all()
         trabajos_resumen = "\n".join(
-            f"  - {t.fecha.strftime('%d/%m/%Y')}: {t.tipo_trabajo} — {t.animales or ''}"
+            f"  - {t.fecha.strftime('%d/%m/%Y')}: {t.tipo_trabajo}, "
+            f"potrero={t.potrero or 'N/D'} — {t.animales or ''}"
             for t in trabajos
         ) or "  Sin datos"
 

@@ -6,7 +6,7 @@ from database.models import TrabajoCorral, TipoTrabajoCatalogo
 from utils.auth import require_auth
 from utils.helpers import (
     load_trabajos, load_catalogo_tipos, get_tipos_por_categoria,
-    categoria_de_tipos, seed_catalogo_tipos_si_vacio,
+    categoria_de_tipos, seed_catalogo_tipos_si_vacio, load_potreros,
     CATEGORIAS_TRABAJO_ORDEN, CATEGORIAS_TRABAJO_EMOJI,
 )
 from utils.editor import editable_table
@@ -82,12 +82,18 @@ with st.expander("⚙️ Administrar tipos de trabajo", expanded=False):
 
 # ── Formulario: registrar nuevo trabajo (combinando tipos con checks) ─────────
 tipos_por_cat = get_tipos_por_categoria(solo_activos=True)
+df_potreros = load_potreros()
+potreros_lista = df_potreros["Nombre"].tolist() if not df_potreros.empty else []
 
 with st.expander("➕ Registrar nuevo trabajo", expanded=False):
     with st.form("form_trabajo", clear_on_submit=True):
         c1, c2 = st.columns(2)
         with c1:
             fecha = st.date_input("Fecha", value=date.today())
+            if potreros_lista:
+                potrero = st.selectbox("Potrero (opcional)", ["(Sin especificar)"] + potreros_lista)
+            else:
+                potrero = st.text_input("Potrero (opcional)")
         with c2:
             animales = st.text_area("Animales trabajados", height=80,
                                     placeholder="Ej: 205 terneras + 36 vaquillas en espera")
@@ -120,6 +126,7 @@ with st.expander("➕ Registrar nuevo trabajo", expanded=False):
         else:
             tipo_texto = " + ".join(tipos_finales)
             categoria_final = categoria_de_tipos(seleccionados) if seleccionados else "Otro"
+            potrero_val = potrero.strip() if potrero and potrero != "(Sin especificar)" else None
             db = get_session()
             try:
                 trabajo = TrabajoCorral(
@@ -128,6 +135,7 @@ with st.expander("➕ Registrar nuevo trabajo", expanded=False):
                     tipo_trabajo=tipo_texto,
                     animales=animales.strip() or None,
                     resultado=resultado.strip() or None,
+                    potrero=potrero_val,
                     notas=notas.strip() or None,
                 )
                 db.add(trabajo)
@@ -184,7 +192,8 @@ else:
         TrabajoCorral,
         {
             "Fecha": "fecha", "Categoría": "categoria", "Tipo de Trabajo": "tipo_trabajo",
-            "Animales": "animales", "Resultado": "resultado", "Notas": "notas",
+            "Animales": "animales", "Resultado": "resultado", "Potrero": "potrero",
+            "Notas": "notas",
         },
         key="edit_trabajos",
         extra_config={

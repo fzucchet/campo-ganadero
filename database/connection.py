@@ -44,6 +44,11 @@ def _migrar_columnas(engine):
         if "composicion" not in cols:
             with engine.begin() as conn:
                 conn.execute(text("ALTER TABLE ventas ADD COLUMN composicion VARCHAR(255)"))
+    if "trabajos_corral" in insp.get_table_names():
+        cols = [c["name"] for c in insp.get_columns("trabajos_corral")]
+        if "potrero" not in cols:
+            with engine.begin() as conn:
+                conn.execute(text("ALTER TABLE trabajos_corral ADD COLUMN potrero VARCHAR(100)"))
 
 
 def _normalizar_potreros_mortandad(engine):

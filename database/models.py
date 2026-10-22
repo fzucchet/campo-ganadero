@@ -39,6 +39,7 @@ class TrabajoCorral(Base):
     tipo_trabajo = Column(String(100), nullable=False)  # aftosa, tactos, vitaminas, pesaje, ricobendazol, etc.
     animales = Column(Text, nullable=True)               # descripción de los animales trabajados
     resultado = Column(Text, nullable=True)              # resultados / observaciones
+    potrero = Column(String(100), nullable=True)
     notas = Column(Text, nullable=True)
 
 
